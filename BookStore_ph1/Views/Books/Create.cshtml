@@ -1,0 +1,90 @@
+﻿@model BookStore_ph1.ViewModels.BookGenreCreateViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Book</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Book.Title" class="control-label"></label>
+                <input asp-for="Book.Title" class="form-control" />
+                <span asp-validation-for="Book.Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Book.YearPublished" class="control-label"></label>
+                <input asp-for="Book.YearPublished" class="form-control" />
+                <span asp-validation-for="Book.YearPublished" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Book.NumPages" class="control-label"></label>
+                <input asp-for="Book.NumPages" class="form-control" />
+                <span asp-validation-for="Book.NumPages" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Book.Description" class="control-label"></label>
+                <input asp-for="Book.Description" class="form-control" />
+                <span asp-validation-for="Book.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Book.Publisher" class="control-label"></label>
+                <input asp-for="Book.Publisher" class="form-control" />
+                <span asp-validation-for="Book.Publisher" class="text-danger"></span>
+            </div>
+            @* <div class="form-group">
+                <label asp-for="Book.FrontPage" class="control-label"></label>
+                <input asp-for="Book.FrontPage" class="form-control" />
+                <span asp-validation-for="Book.FrontPage" class="text-danger"></span>
+            </div> *@
+            <div>
+                <label asp-for="File"></label>
+                <input asp-for="File" type="file" />
+                <span asp-validation-for="File"></span>
+            </div>
+           @*  <div class="form-group">
+                <label asp-for="Book.DownloadUrl" class="control-label"></label>
+                <input asp-for="Book.DownloadUrl" class="form-control" />
+                <span asp-validation-for="Book.DownloadUrl" class="text-danger"></span>
+            </div> *@
+            <div class="form-group">
+                <label asp-for="Book.AuthorId" class="control-label"></label>
+                <select asp-for="Book.AuthorId" class="form-control" asp-items="ViewBag.AuthorId">
+                    <option value="">Select</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Genres</label>
+                <select asp-for="SelectedGenres" class="form-control js-example-basic-multiple"
+                        asp-items="Model.GenreList"> </select>
+                <span asp-validation-for="SelectedGenres" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#SelectedGenres").select2();
+        });
+    </script>
+}

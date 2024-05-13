@@ -1,0 +1,115 @@
+﻿@model BookStore_ph1.ViewModels.BookGenreIndexViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<h1>Index</h1>
+
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<form asp-controller="Books" asp-action="Index" method="get">
+    <p>
+        Title: <input type="text" asp-for="SearchString" />
+        <input type="submit" value="Search" />
+        <select asp-for="SearchCriteria">
+            <option disabled selected>Search Criteria</option>
+            <option value="Title">Title</option>
+            <option value="Author">Author</option>
+            <option value="Genre">Genre</option>
+        </select>
+    </p>
+
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Books[0].FrontPage)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Books[0].Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Books[0].Author)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Books[0].YearPublished)
+            </th>
+            <th>
+                Average Rating
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Books[0].BookGenres)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Books[0].DownloadUrl)
+
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Books)
+        {
+            <tr>
+                <td>
+                    @if (item.FrontPage != null)
+                    {
+                        <img src="@item.FrontPage" height="300px" width="200px" asp-append-version="true" />
+                    }
+                    else
+                    {
+                        <p>Image not found.</p>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Author.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.YearPublished)
+                </td>
+                @{
+                    var averageRating = item.Reviews?.Count > 0 ? item.Reviews.Average(r => r.Rating) : 0;
+                    <td>
+                        @String.Format("{0:0.00}", averageRating)
+                    </td>
+                }
+
+                @{
+                    <td>
+                        @foreach (var genre in item.BookGenres)
+                        {
+                            <a asp-controller="Genres" asp-action="Details" asp-route-id="@genre.GenreId"> @genre.Genre.GenreName </a>
+                            <br />
+                        }
+                    </td>
+                }
+
+
+                <td>
+                    <form a asp-action="GetPdf" asp-controller="Books">
+                        <input name="url" type="hidden" value="@item.DownloadUrl">
+                        <input type="submit" value="Download pdf">
+                    </form>
+
+                </td>
+                <td align="right">
+
+                    <a asp-action="Edit" asp-route-id="@item.BookId">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.BookId">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.BookId">Delete</a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
