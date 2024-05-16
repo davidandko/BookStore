@@ -1,5 +1,5 @@
-﻿@model BookStore_ph1.ViewModels.BookGenreIndexViewModel
-
+﻿@* @model BookStore_ph1.ViewModels.BookGenreIndexViewModel
+    !<--This is the old style-->
 @{
     ViewData["Title"] = "Index";
 }
@@ -7,16 +7,22 @@
 
 <h1>Index</h1>
 
+<div>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+
+
 
 <form asp-controller="Books" asp-action="Index" method="get">
     <p>
-        Title: <input type="text" asp-for="SearchString" />
-        <input type="submit" value="Search" />
-        <select asp-for="SearchCriteria">
+        <div class="input-group mb-3">
+            <input asp-for="SearchString" type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="basic-addon2">
+            <div class="input-group-append m-1">
+                <input class="btn btn-primary" type="submit" value="Search" />
+            </div>
+        </div>
+        <select asp-for="SearchCriteria" class="form-control-sm">
             <option disabled selected>Search Criteria</option>
             <option value="Title">Title</option>
             <option value="Author">Author</option>
@@ -59,13 +65,13 @@
         {
             <tr>
                 <td>
-                    @if (item.FrontPage != null)
+                    @if (!string.IsNullOrEmpty(item.FrontPage))
                     {
-                        <img src="@item.FrontPage" height="300px" width="200px" asp-append-version="true" />
+                        <img src="@item.FrontPage" height="300" width="200" />
                     }
                     else
                     {
-                        <p>Image not found.</p>
+                        <p>No cover available.</p>
                     }
                 </td>
                 <td>
@@ -96,10 +102,14 @@
 
 
                 <td>
-                    <form a asp-action="GetPdf" asp-controller="Books">
-                        <input name="url" type="hidden" value="@item.DownloadUrl">
-                        <input type="submit" value="Download pdf">
-                    </form>
+                    @if (!string.IsNullOrEmpty(item.DownloadUrl))
+                    {
+                        <a href="@item.DownloadUrl" target="_blank">Download</a>
+                    }
+                    else
+                    {
+                        <p>No e-book available.</p>
+                    }
 
                 </td>
                 <td align="right">
@@ -113,3 +123,116 @@
         }
     </tbody>
 </table>
+ *@
+
+@model BookStore_ph1.ViewModels.BookGenreIndexViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+@if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+{
+    <div>
+        <a asp-action="Create" class="btn btn-primary">Create New</a>
+    </div>
+}
+
+
+<form asp-controller="Books" asp-action="Index" method="get">
+    <p>
+        <div class="input-group mb-3">
+            <input asp-for="SearchString" type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="basic-addon2">
+            <div class="input-group-append m-1">
+                <input class="btn btn-primary" type="submit" value="Search" />
+            </div>
+        </div>
+        <select asp-for="SearchCriteria" class="form-control-sm">
+            <option disabled selected>Search Criteria</option>
+            <option value="Title">Title</option>
+            <option value="Author">Author</option>
+            <option value="Genre">Genre</option>
+        </select>
+    </p>
+</form>
+<hr />
+<div class="row">
+    @foreach (var item in Model.Books)
+    {
+        <div class="col-md-4 mb-4" style="width: 20rem">
+            <div class="card">
+                @if (!string.IsNullOrEmpty(item.FrontPage))
+                {
+                    <img src="@item.FrontPage" class="card-img-top" alt="Book Cover">
+                }
+                <div class="card-body p-2">
+                    <h2 class="card-title text-center">@item.Title</h2>
+                    <h5 class="card-text text-center">Author:</h5>
+                    <div class="row mb-3">
+                        <div class="col text-center">
+                            <a asp-controller="Authors" asp-action="Details" asp-route-id="@item.AuthorId" class="btn btn-outline-secondary mb-1">
+                                @item.Author.FullName
+                            </a>
+                        </div>
+                    </div>
+                    <h5 class="card-text text-center">Year Published: </h5>
+                    <p class="card-text text-center">@item.YearPublished</p>
+                    @{
+                        var averageRating = item.Reviews?.Count > 0 ? item.Reviews.Average(r => r.Rating) : 0;
+                    }
+                    <h5 class="card-text text-center">Average Rating: </h5>
+                    <div class="rating text-center">
+                        <span class="fa fa-star checked card-text text-center">@String.Format("{0:0.00}", averageRating)</span>
+                    </div>
+
+                   
+                    <h5 class="card-text text-center">Genres:</h5>
+                    <div class="row mb-3">
+                        <div class="col text-center">
+                            @foreach (var genre in item.BookGenres)
+                            {
+                                <a asp-controller="Genres" asp-action="Details" asp-route-id="@genre.GenreId" class="btn fixed-width-btn btn-outline-secondary mb-1">
+                                    @genre.Genre.GenreName
+                                </a>
+                            }
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col text-center">
+                            @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("User")))
+                            {
+                                <a href="@item.DownloadUrl" class="btn btn-primary fixed-width-btn mr-2 text-white">Download</a>
+                            }
+                            
+                            @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.BookId" class="btn btn-primary fixed-width-btn">Edit</a>
+                            }
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col text-center">
+                            <a asp-action="Details" asp-route-id="@item.BookId" class="btn btn-primary fixed-width-btn mr-2">Details</a>
+                            @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                            {
+                                <a asp-action="Delete" asp-route-id="@item.BookId" class="btn btn-danger fixed-width-btn">Delete</a>
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col text-center">
+                            <form method="post" asp-controller="Books" asp-action="Buy" asp-route-bookId="@item.BookId">
+                                <button type="submit" class="btn btn-primary fixed-width-btn mr-2">Buy</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+
+

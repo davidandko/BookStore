@@ -1,88 +1,90 @@
-﻿@model BookStore_ph1.Models.Book
+﻿@model BookStore_ph1.ViewModels.BookGenreIndexViewModel
 
 @{
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+
+    <h1>@Html.DisplayFor(model => model.Books[0].Title)</h1>
+    
+
 
 <div>
-    <h4>Book</h4>
+    <div>
+        <img src="@Model.Books[0].FrontPage" height="300" width="190" class="rounded-lg">
+    </div>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.YearPublished)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.YearPublished)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NumPages)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NumPages)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Publisher)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Publisher)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FrontPage)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FrontPage)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DownloadUrl)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DownloadUrl)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Author)
-        </dt>
-        <dd class = "col-sm-10">
-            @if (Model.AuthorId != null)
-            {
-                <a asp-controller="Authors" asp-action="Details" asp-route-id="@Model.AuthorId">@Html.DisplayFor(model => model.Author.FullName)</a>
-            }
-
-        </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Rating)
+            <h5>@Html.DisplayNameFor(model => model.Books[0].YearPublished)</h5>
         </dt>
+        
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Rating)
+            @Html.DisplayFor(model => model.Books[0].YearPublished)
         </dd>
-        <dt class="col-sm-10">
-            @Html.DisplayNameFor(model => model.BookGenres)
+        <hr />
+        <dt class="col-sm-2">
+            <h5>@Html.DisplayNameFor(model => model.Books[0].NumPages)</h5>
         </dt>
         <dd class="col-sm-10">
-            @foreach (var genre in Model.BookGenres)
-            {   
-                <a asp-controller="Genres" asp-action="Details" asp-route-id="@genre.GenreId">
+            @Html.DisplayFor(model => model.Books[0].NumPages)
+        </dd>
+        <hr />
+        <dt class="col-sm-2">
+            <h5>@Html.DisplayNameFor(model => model.Books[0].Description)</h5>
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Books[0].Description)
+        </dd>
+        <hr />
+        <dt class="col-sm-2">
+            <h5>@Html.DisplayNameFor(model => model.Books[0].Publisher)</h5>
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Books[0].Publisher)
+        </dd>
+        <hr />
+        
+        <dt class="col-sm-2">
+            <h5>@Html.DisplayNameFor(model => model.Books[0].Author)</h5>
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Books[0].AuthorId != null)
+            {
+                <a asp-controller="Authors" asp-action="Details" asp-route-id="@Model.Books[0].AuthorId" class="btn btn-outline-secondary mb-1">@Html.DisplayFor(model => model.Books[0].Author.FullName)</a>
+            }
+        </dd>
+        <hr />
+        <dt class="col-sm-2">
+            <h5>@Html.DisplayNameFor(model => model.Books[0].Rating)</h5>
+        </dt>
+        @{
+            var averageRating = Model.Books[0].Reviews?.Count > 0 ? Model.Books[0].Reviews.Average(r => r.Rating) : 0;
+        }
+        <dd class="col-sm-10">
+            @String.Format("{0:0.00}", averageRating)
+        </dd>
+        <hr />
+        <dt class="col-sm-10">
+            <h5>@Html.DisplayNameFor(model => model.Books[0].BookGenres)</h5>
+        </dt>
+        
+        <dd class="col-sm-10">
+            @foreach (var genre in Model.Books[0].BookGenres)
+            {
+                <a asp-controller="Genres" asp-action="Details" asp-route-id="@genre.GenreId" class="btn btn-outline-secondary mb-1">
                     @genre.Genre.GenreName
                 </a> <br />
             }
         </dd>
-        
+        <hr />
     </dl>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.BookId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+        <a asp-action="Index" class="btn btn-primary fixed-width-btn">Back</a>
+@if(User.IsInRole("Admin") && User.Identity.IsAuthenticated)
+{
+    <a asp-action="Edit" asp-route-id="@Model?.Books[0].BookId" class="btn btn-primary fixed-width-btn mr-3">Edit</a>
+    <a asp-action="Delete" asp-route-id="@Model.Books[0].BookId" class="btn btn-danger fixed-width-btn mr-3">Delete</a>
+}
+
+

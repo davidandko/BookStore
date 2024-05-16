@@ -15,7 +15,7 @@ namespace BookStore_ph1.Models
         [Required,StringLength(500)]
         public string Comment { get; set; }
 
-        [Range(minimum:1,maximum:10)]
+        [Range(minimum:1,maximum:5)]
         public int? Rating { get; set; }
     }
 }

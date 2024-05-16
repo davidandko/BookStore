@@ -7,36 +7,81 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BookStore_ph1.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-nY5vU1yr8D89K31MjsH7P3mL+hqcdPefr33a7plt5cRqGmVoXJxVI9zr3i4xPzmwFpJ6x0Etpejty+Wm/+rPTg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+
+
 </head>
 
 <style>
     /*navbar styles*/
-    nav{
-        background-color: #C09BD8;
-        color:black;
-    }
     input{
-        border-radius:5px;
+        border-radius:10px;
         border: none;
+        
     }
     
     
     /* content styles */
     body {
-        background: linear-gradient(90deg, #4b6cb7, #EBC3DB);
+        background-color: #F0E6EF;
         min-height: 100vh;
     }
+    a{
+        text-decoration:none;
 
+    }
     
     .container {
         color: black;
     }
-</style>
+    .card img{
+        border-radius:25px;
+    }
+    .card{
+        background-color: #EFEFEF;
+        border-radius:25px;
+    }
+    .card:hover{
+            box-shadow: 0 20px 21px rgba(0, 0, 0, 0.1), 0 20px 19px rgba(0,0,0,0.13);
+            transition: box-shadow 0.5s ease-in;
+    }
+    .card:not(:hover){
+            transition: box-shadow 1s ease-out;
+            box-shadow: 0 0 0 transparent;
+    }
+
+    .fixed-width-btn {
+        width: 130px; /* Adjust the width as needed */
+    }
+    .nav-btn{
+        background: #9C89B8;
+        outline-color: transparent;
+        border-color:transparent
+    }
+    .nav-btn:hover{
+            background: #9C89B8;
+            box-shadow: 0 4px 5px rgba(0, 0, 0, 0.1), 0 5px 3px rgba(0,0,0,0.13);
+            transition: box-shadow 0.3s ease-in;
+            outline-color: transparent;
+            border-color: transparent
+    }
+    .nav-btn:not(:hover){
+            transition: box-shadow 1s ease-out;
+            box-shadow: 0 0 0 transparent;
+    }
+
+    
+        </style>
 
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand navbar-toggleable navbar-light border-bottom " >
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">David's Book Store</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -45,44 +90,66 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        <li class="nav-item m-1">
+                            <a class="btn btn-primary nav-btn" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <li class="nav-item m-1">
+                            <a class="btn btn-primary nav-btn" asp-area="" asp-controller="Authors" asp-action="Index">Authors</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Authors" asp-action="Index">Authors</a>
+                        <li class="nav-item m-1">
+                            <a class="btn btn-primary nav-btn" asp-area="" asp-controller="Books" asp-action="Index">Books</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Books" asp-action="Index">Books</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Genres" asp-action="Index">Genres</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Reviews" asp-action="Index">Reviews</a>
-                        </li>
+
+                        @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("User")))
+                        {
+                            <li class="nav-item m-1">
+                                <a class="btn btn-primary nav-btn" asp-area="" asp-controller="Genres" asp-action="Index">Genres</a>
+                            </li>
+                        }
+                        
+                        @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("User"))){
+                            <li class="nav-item m-1">
+                                <a class="btn btn-primary nav-btn" asp-area="" asp-controller="Reviews" asp-action="Index">Reviews</a>
+                            </li>
+                        }
+                        
                     </ul>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("User"))
+                    {
+                        <span class="nav-item m-1">
+                            <a class="btn btn-primary fixed-width-btn " style="background-color:#9C89B8; color:white; border-color:transparent;" asp-area="" asp-controller="UserBooks" asp-action="Index">My Books</a>
+                        </span>
+                    }
                     <partial name="_LoginPartial" />
+                    
                 </div>
             </div>
         </nav>
+
     </header>
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
+           
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - BookStore_ph1 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!--CAROUSEL-->
+    <!-- JQuery Plugin -->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Bootstrap JQuery Plugin -->
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
+    <!-- Additional Javascript -->
+    <script src="js/main.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -10,6 +10,14 @@ using BookStore_ph1.Models;
 using BookStore_ph1.ViewModels;
 using BookStore_ph1.Data.Migrations;
 using System.Drawing.Text;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using static System.Reflection.Metadata.BlobBuilder;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+
 
 namespace BookStore_ph1.Controllers
 {
@@ -17,10 +25,12 @@ namespace BookStore_ph1.Controllers
     {
          
         private readonly ApplicationDbContext _context;
-        
+
+
         public BooksController(ApplicationDbContext context)
         {
             _context = context;
+
         }
 
         // GET: Books
@@ -64,24 +74,26 @@ namespace BookStore_ph1.Controllers
         // GET: Books/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            IQueryable<Book> books = _context.Books.AsQueryable();
             if (id == null)
             {
                 return NotFound();
             }
+            books = books.Include(x => x.Author)
+                 .Include(x => x.Reviews)
+                 .Include(x => x.BookGenres!).ThenInclude(x => x.Genre);
 
-            var book = await _context.Books
-                .Include(b => b.Author)
-                .Include(b => b.BookGenres)
-                .ThenInclude(b => b.Genre)
-                .FirstOrDefaultAsync(m => m.BookId == id);
-            if (book == null)
+            var bookIndex = new BookGenreIndexViewModel
             {
-                return NotFound();
-            }
+                Books = await books.ToListAsync(),
+                Genres = await _context.Genre.ToListAsync(),
+                
+            };
 
-            return View(book);
+            return View(bookIndex);
+
         }
-
+        [Authorize(Roles = "Admin")]
         // GET: Books/Create
         public IActionResult Create()
         {
@@ -99,32 +111,29 @@ namespace BookStore_ph1.Controllers
             ViewData["AuthorId"] = new SelectList(_context.Authors, "AuthorId", "FullName");
             return View(viewModel);
         }
-
+        
         // POST: Books/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(BookGenreCreateViewModel viewmodel,List<IFormFile> files)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create(BookGenreCreateViewModel viewmodel)
         {
-            long size = files.Sum(f => f.Length);
-            
-            
-            
-            foreach (var formFile in files)
-            {
-                if(formFile.Length == 1)
-                {
-                    var filePath = Path.GetTempFileName();
-                    using (var stream = System.IO.File.Create(filePath))
-                    {
-                        await formFile.CopyToAsync(stream);
-                        
-                    }
-                }
-            }
+
+
             if (ModelState.IsValid)
             {
+                if (viewmodel.FrontPageFile != null)
+                {
+                    viewmodel.Book.FrontPage = await UploadFile(viewmodel.FrontPageFile);
+                }
+
+                if (viewmodel.EBookFile != null)
+                {
+                    viewmodel.Book.DownloadUrl = await UploadFile(viewmodel.EBookFile);
+                }
+
                 _context.Add(viewmodel.Book);
                 await _context.SaveChangesAsync();
                 if (viewmodel.SelectedGenres != null)
@@ -147,7 +156,31 @@ namespace BookStore_ph1.Controllers
             return View(viewmodel.Book);
         }
 
+
+        // File Upload Service 
+        [Authorize(Roles = "Admin")]
+        private async Task<string> UploadFile(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return null;
+
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(fileStream);
+            }
+
+            return "/uploads/" + uniqueFileName; // Return the relative path to the file
+        }
+
         // GET: Books/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Books == null)
@@ -174,12 +207,13 @@ namespace BookStore_ph1.Controllers
             ViewData["AuthorId"] = new SelectList(_context.Authors, "AuthorId", "FullName", book.AuthorId);
             return View(viewmodel);
         }
-
+        
         // POST: Books/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, BookGenreEditViewModel viewmodel)
         {
             if (id != viewmodel.Book?.BookId)
@@ -230,6 +264,7 @@ namespace BookStore_ph1.Controllers
         }
 
         // GET: Books/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -249,10 +284,11 @@ namespace BookStore_ph1.Controllers
 
             return View(book);
         }
-
+        
         // POST: Books/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var book = await _context.Books.FindAsync(id);
@@ -268,6 +304,39 @@ namespace BookStore_ph1.Controllers
         private bool BookExists(int id)
         {
             return _context.Books.Any(e => e.BookId == id);
+        }
+
+
+        //POST: Books/Index/BUY
+        [HttpPost]
+        [Authorize(Roles = "User")] // Ensure only authenticated users can buy books
+        public async Task<IActionResult> Buy(int bookId)
+        {
+            
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string username = User.Identity.Name;
+            
+            var existingUserBook = await _context.UserBooks.FirstOrDefaultAsync(ub => ub.AppUser == userId && ub.BookId == bookId);
+
+            if (existingUserBook != null)
+            {
+                
+                TempData["Message"] = "You have already bought this book.";
+            }
+            else
+            {
+                var newUserBook = new UserBooks
+                {
+                    AppUser = userId,
+                    BookId = bookId
+                };
+                _context.Add(newUserBook);
+                await _context.SaveChangesAsync();
+
+                TempData["Message"] = "Book bought successfully."; // Optional: Show a success message
+            }
+
+            return RedirectToAction(nameof(Index)); // Redirect back to the index page
         }
     }
 }

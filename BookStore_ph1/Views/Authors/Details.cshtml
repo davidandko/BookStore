@@ -1,4 +1,4 @@
-﻿@model BookStore_ph1.Models.Author
+﻿@model BookStore_ph1.ViewModels.AuthorBookDetailsViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -10,39 +10,78 @@
     <h4>Author</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Author.FirstName)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FirstName)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Author.FirstName)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastName)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Author.LastName)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LastName)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Author.LastName)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BirthDate)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Author.BirthDate)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BirthDate)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Author.BirthDate)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nationality)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Author.Nationality)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nationality)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Author.Nationality)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Gender)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Author.Gender)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Gender)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Author.Gender)
         </dd>
     </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.AuthorId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <hr />
+    <h4>Books from this author:</h4>
+    <hr />
+    @for (var i = 0; i < Model.Books.Count; i++)
+    {
+        if (Model.Books[i].AuthorId == Model.Author.AuthorId)
+        {
+            <div>
+                <img src="@Model.Books[i].FrontPage" height="300" width="190" class="rounded-lg">
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-sm-2">
+                    <h5>@Html.DisplayNameFor(model => model.Books[i].YearPublished)</h5>
+                </div>
+                <div class="col-sm-10">
+                    @Html.DisplayFor(model => model.Books[i].YearPublished)
+                </div>
+                <hr />
+                <div class="col-sm-2">
+                    <h5>@Html.DisplayNameFor(model => model.Books[i].NumPages)</h5>
+                </div>
+                <div class="col-sm-10">
+                    @Html.DisplayFor(model => model.Books[i].NumPages)
+                </div>
+                <hr />
+                <div class="col-sm-2">
+                    <h5>@Html.DisplayNameFor(model => model.Books[i].Description)</h5>
+                </div>
+                <div class="col-sm-10">
+                    @Html.DisplayFor(model => model.Books[i].Description)
+                </div>
+            </div>
+        }
+    }
+    <div>
+        @if(User.IsInRole("Admin") && User.Identity.IsAuthenticated)
+        {
+            <a asp-action="Edit" asp-route-id="@Model?.Author.AuthorId" class="btn btn-primary fixed-width-btn mr-1">Edit</a>
+        }
+        
+        <a asp-action="Index" class="btn btn-primary fixed-width-btn">Back</a>
+    </div>
 </div>

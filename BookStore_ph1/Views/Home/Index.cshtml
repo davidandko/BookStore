@@ -1,8 +1,87 @@
-﻿@{
+﻿ @{
     ViewData["Title"] = "Home Page";
 }
+@model BookStore_ph1.ViewModels.BookGenreIndexViewModel
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <div class="text-center">
+
+            <h1>Welcome</h1>
+            @if (User.Identity.IsAuthenticated || User.IsInRole("Admin") || User.IsInRole("User")) ;
+            <h2>@User.Identity?.Name</h2>
+            <h2>Check out our assortment of books!</h2>
+            <hr />
+        </div>
+
+        <div class="container">
+
+        <div class="row">
+
+                <div class="col-md-12">
+                    <div class="col-md-12">
+                        <div class="button-placement d-none d-sm-none d-md-block mb-3 text-center">
+                            <a class="btn btn-sm btn-secondary" href="#carouselExample" role="button" data-slide="prev"> <i class="fas fa-chevron-circle-left"></i> </a>
+                            <a class="btn btn-sm btn-secondary" href="#carouselExample" role="button" data-slide="next"> <i class="fas fa-chevron-circle-right"></i> </a>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+            <div id="carouselExample" class="carousel slide d-none d-sm-none d-md-block   border border-primary rounded mb-3 p-3 bg-secondary" data-ride="carousel">
+                    <div class="carousel-inner">
+          
+
+                            <div class="carousel-item active">
+
+                                <div class="row">
+
+                                        @for (var j = 0; j < 4; j++)
+                                        {
+                                            <div class="col-md-3">
+                                                <div class="product-block">
+                                                    <img class="d-block w-100 rounded-3" src="@Model.Books[j].FrontPage" alt="Book" width="220" height="400">
+                                                </div>
+                                            </div>
+                                        }
+
+                                </div>
+
+                            </div>
+                        <div class="carousel-item">
+
+                            <div class="row">
+
+                                @for(var i=4;i<Model.Books.Count;i++){
+                                    <div class="col-md-3">
+                                        <div class="product-block">
+                                            <img class="d-block w-100 rounded-3" src="@Model.Books[i].FrontPage" alt="Book" width="220" height="400">
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- End of Row -->
+
+        </div>
+    <!-- End of Container -->
+
+
+    <!-- JQuery Plugin -->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Bootstrap JQuery Plugin -->
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
+    <!-- Additional Javascript -->
+    <script src="js/main.js"></script>

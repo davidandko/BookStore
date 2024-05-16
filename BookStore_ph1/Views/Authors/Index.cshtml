@@ -1,37 +1,49 @@
-﻿@model IEnumerable<BookStore_ph1.Models.Author>
+﻿@model BookStore_ph1.ViewModels.AuthorIndexViewModel
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
-
+<h1>Authors</h1>
+@if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+{
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
 </p>
+}
+<form asp-controller="Authors" asp-action="Index" method="get">
+    <p>
+        <div class="input-group mb-3">
+            <input asp-for="SearchString" type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="basic-addon2">
+            <div class="input-group-append m-1">
+                <input class="btn btn-primary" type="submit" value="Search" />
+            </div>
+        </div>
+    </p>
+</form>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.FirstName)
+                @Html.DisplayNameFor(model => model.Authors[0].FirstName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LastName)
+                @Html.DisplayNameFor(model => model.Authors[0].LastName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.BirthDate)
+                @Html.DisplayNameFor(model => model.Authors[0].BirthDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Nationality)
+                @Html.DisplayNameFor(model => model.Authors[0].Nationality)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Gender)
+                @Html.DisplayNameFor(model => model.Authors[0].Gender)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Authors) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.FirstName)
@@ -49,9 +61,12 @@
                 @Html.DisplayFor(modelItem => item.Gender)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.AuthorId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.AuthorId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.AuthorId">Delete</a>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.AuthorId" class="btn btn-primary fixed-width-btn mr-1">Edit</a> 
+                        <a asp-action="Delete" asp-route-id="@item.AuthorId" class="btn btn-danger fixed-width-btn mr-1">Delete</a>
+                    }
+                    <a asp-action="Details" asp-route-id="@item.AuthorId" class="btn btn-primary fixed-width-btn mr-1">Details</a>
             </td>
         </tr>
 }

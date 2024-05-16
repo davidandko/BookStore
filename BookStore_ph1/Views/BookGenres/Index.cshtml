@@ -5,10 +5,13 @@
 }
 
 <h1>Index</h1>
+@if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -31,9 +34,13 @@
                 @Html.DisplayFor(modelItem => item.Genre.GenreName)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.BookGenreId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.BookGenreId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.BookGenreId">Delete</a>
+                 @if (User.Identity.IsAuthenticated && User.IsInRole("Admin")){
+                        <a asp-action="Edit" asp-route-id="@item.BookGenreId" class="btn btn-primary mr-1">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.BookGenreId" class="btn btn-primary mr-1">Delete</a>
+                 }
+
+
+                    <a asp-action="Details" asp-route-id="@item.BookGenreId" class="btn btn-primary">Details</a> |
             </td>
         </tr>
 }

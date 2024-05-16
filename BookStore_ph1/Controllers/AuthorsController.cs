@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BookStore_ph1.Data;
 using BookStore_ph1.Models;
+using BookStore_ph1.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace BookStore_ph1.Controllers
 {
@@ -20,9 +23,25 @@ namespace BookStore_ph1.Controllers
         }
 
         // GET: Authors
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchstring)
         {
-            return View(await _context.Authors.ToListAsync());
+            IQueryable<Author> authors = _context.Authors.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchstring))
+            {
+                authors = authors.Where(x => x.FirstName.Contains(searchstring) || x.LastName.Contains(searchstring));
+            }
+
+
+            var authorIndex = new AuthorIndexViewModel
+            {
+                Authors = await authors.ToListAsync(),
+                SearchString = searchstring
+     
+            };
+
+
+            return View(authorIndex);
         }
 
         // GET: Authors/Details/5
@@ -32,18 +51,26 @@ namespace BookStore_ph1.Controllers
             {
                 return NotFound();
             }
-
+            IQueryable<Book> books = _context.Books.AsQueryable();
+            
             var author = await _context.Authors
                 .FirstOrDefaultAsync(m => m.AuthorId == id);
-            if (author == null)
-            {
-                return NotFound();
-            }
+            
+            books = books.Include(x => x.Author);
 
-            return View(author);
+
+            var authorBook = new AuthorBookDetailsViewModel
+            {
+                Books = await books.ToListAsync(),
+                Author = author
+
+            };
+
+            return View(authorBook);
         }
 
         // GET: Authors/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -66,6 +93,7 @@ namespace BookStore_ph1.Controllers
         }
 
         // GET: Authors/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -86,6 +114,7 @@ namespace BookStore_ph1.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("AuthorId,FirstName,LastName,BirthDate,Nationality,Gender")] Author author)
         {
             if (id != author.AuthorId)
@@ -117,6 +146,7 @@ namespace BookStore_ph1.Controllers
         }
 
         // GET: Authors/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -137,6 +167,7 @@ namespace BookStore_ph1.Controllers
         // POST: Authors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var author = await _context.Authors.FindAsync(id);

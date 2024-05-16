@@ -13,13 +13,8 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="BookId" class="control-label"></label>
+                <label asp-for="BookId" class="control-label">Book</label>
                 <select asp-for="BookId" class ="form-control" asp-items="ViewBag.BookId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="AppUser" class="control-label"></label>
-                <input asp-for="AppUser" class="form-control" />
-                <span asp-validation-for="AppUser" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Comment" class="control-label"></label>
@@ -32,14 +27,14 @@
                 <span asp-validation-for="Rating" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Create" class="btn btn-primary fixed-width-btn mb-3 mt-1" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" class="btn btn-primary fixed-width-btn mb-3">Back</a>
 </div>
 
 @section Scripts {

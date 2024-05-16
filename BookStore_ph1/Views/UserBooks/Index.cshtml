@@ -5,16 +5,14 @@
 }
 
 <h1>Index</h1>
+@if (User.IsInRole("Admin") && User.Identity.IsAuthenticated)
+{
+        <a asp-action="Create" class="btn btn-primary">Create New</a>
+}
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.AppUser)
-            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Book)
             </th>
@@ -23,17 +21,18 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.AppUser)
-            </td>
+            <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Book.Title)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.UserBooksId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.UserBooksId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.UserBooksId">Delete</a>
+                    @if (User.IsInRole("Admin") && User.Identity.IsAuthenticated)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.UserBooksId">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.UserBooksId">Delete</a>
+                    }
+                    <a asp-controller="Books" asp-action="Details" asp-route-id="@item.Book.BookId" class="btn btn-primary fixed-width-btn mr-1">Details</a>
+                    <a asp-controller="Reviews" asp-action="Create" class="btn btn-primary fixed-width-btn">Add Review</a>
             </td>
         </tr>
 }

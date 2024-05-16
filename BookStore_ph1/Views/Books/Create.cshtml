@@ -10,7 +10,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Book.Title" class="control-label"></label>
@@ -37,21 +37,17 @@
                 <input asp-for="Book.Publisher" class="form-control" />
                 <span asp-validation-for="Book.Publisher" class="text-danger"></span>
             </div>
-            @* <div class="form-group">
-                <label asp-for="Book.FrontPage" class="control-label"></label>
-                <input asp-for="Book.FrontPage" class="form-control" />
-                <span asp-validation-for="Book.FrontPage" class="text-danger"></span>
-            </div> *@
-            <div>
-                <label asp-for="File"></label>
-                <input asp-for="File" type="file" />
-                <span asp-validation-for="File"></span>
+            <div class="form-group">
+                <label class="control-label">Select cover:</label>
+                <input asp-for="FrontPageFile" type="file" name="FrontPageFile" />
             </div>
-           @*  <div class="form-group">
-                <label asp-for="Book.DownloadUrl" class="control-label"></label>
-                <input asp-for="Book.DownloadUrl" class="form-control" />
-                <span asp-validation-for="Book.DownloadUrl" class="text-danger"></span>
-            </div> *@
+
+            <div class="form-group">
+                <label class="control-label">Select book:</label>
+                <input asp-for="EBookFile" type="file" name="EBookFile" />
+            </div>
+
+
             <div class="form-group">
                 <label asp-for="Book.AuthorId" class="control-label"></label>
                 <select asp-for="Book.AuthorId" class="form-control" asp-items="ViewBag.AuthorId">
