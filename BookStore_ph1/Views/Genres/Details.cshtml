@@ -19,6 +19,10 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.GenreId" class="btn btn-primary fixed-width-btn mb-3">Edit</a> 
+    @if(User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model?.GenreId" class="btn btn-primary fixed-width-btn mb-3">Edit</a>
+    }
+   
     <a asp-action="Index" class="btn btn-primary fixed-width-btn mb-3">Back</a>
 </div>
